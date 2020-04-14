@@ -5,7 +5,7 @@
 *.tar.gz
 
 # Ignore Generated files
-timelaps.mp4
+timelapse.mp4
 timelapse-hd.mp4
 timelapse.gif
 
