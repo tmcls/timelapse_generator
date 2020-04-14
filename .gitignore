@@ -1,0 +1,13 @@
+# Ignore import images
+*.jpg
+
+# Ignore Backups
+*.tar.gz
+
+# Ignore Generated files
+timelaps.mp4
+timelapse-hd.mp4
+timelapse.gif
+
+# System files
+.DS_Store
