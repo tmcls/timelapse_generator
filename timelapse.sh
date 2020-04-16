@@ -22,10 +22,10 @@ alignment()
 video_hd()
 {
     echo "Creating MP4 HD version..."
-    crop_width=1280
+    crop_width=1420
     crop_height=($crop_width/1920)*1080 
-    crop_x=380
-    crop_y=50
+    crop_x=280
+    crop_y=30
     ffmpeg -loglevel error -r 40 -pattern_type glob -i '*.jpg' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd720 -vcodec libx264 -crf 10 -preset veryslow -y timelapse-hd.mp4
     echo " - Created timelapse-hd.mp4"
 }
@@ -33,11 +33,11 @@ video_hd()
 video()
 {
     echo "Creating MP4 small version..."
-    crop_width=1280
+    crop_width=1420
     crop_height=($crop_width/1920)*1080 
-    crop_x=380
-    crop_y=50
-    ffmpeg -loglevel error -r 40 -pattern_type glob -i '*.jpg' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd480 -vcodec libx264 -crf 23 -y timelapse.mp4
+    crop_x=280
+    crop_y=30
+    ffmpeg -loglevel error -r 40 -pattern_type glob -i '*.jpg' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd480 -vcodec libx264 -crf 20 -y timelapse.mp4
     echo " - Created timelapse.mp4"
 }
 
