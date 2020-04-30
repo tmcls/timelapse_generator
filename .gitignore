@@ -1,10 +1,10 @@
-# Ignore import images
+# Exclude the original images
 *.jpg
 
-# Ignore Backups
+# Ignore generated Backups
 *.tar.gz
 
-# Ignore Generated files
+# Ignore generated files
 timelapse.mp4
 timelapse-hd.mp4
 timelapse.gif
