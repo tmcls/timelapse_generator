@@ -1,20 +1,34 @@
 #!/bin/sh
 
+# This script creates a timelapse and backup of images in one folder.
+# You can run the script with the following commands.
+#
+#   Create the SD version:
+#     > python timelapse.sh
+#     > python timelapse.sh --video
+#
+#   Create the HD version
+#     > python timelapse.sh --hd
+#
+#   Create thr SD and HD version at once.
+#     > python timelapse.sh --video --hd
+
+
 ################## SETTINGS ##################
 
-# Set the width of the crop region
+# Video - Set the width of the crop region
 crop_width=1420
 
-# The Crop height is calculated based ont eh original video aspect ratio
+# Video - The crop height is calculated based ont eh original video aspect ratio
 crop_height=($crop_width/1920)*1080 
 
-# Set crop X-position
+# Video - Set crop X-position
 crop_x=280
 
-# Set crop X-position
+# Video - Set crop X-position
 crop_y=30
 
-# Set Compression level
+# Backup - Set compression level
 export GZIP=-9
 
 ################## FUNCTIONS ##################
@@ -35,12 +49,12 @@ video_hd()
 
 ################## RUN SCRIPT ##################
 
-# Change working directory to the Dropbox Werfcam folder
-echo "Change directory to /Werfcam..."
+# Change working directory to the correct folder
+echo "Change directory to image folder..."
 cd /Users/tom/Dropbox/Apps/Werfcam/
 echo " - Current directory is: $PWD"
 
-# Create Backup of the day, if backupfile not exists
+# Create Backup of the day, if backup file not exists
 name=$(date '+%Y%m%d')
 if [[ ! -f "$name.tar.gz" ]]; then
     echo "Creating backup ($name.tar.gz) of images..."
