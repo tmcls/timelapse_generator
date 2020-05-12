@@ -1,14 +1,5 @@
-# Exclude the original images
-*.jpg
+# Exclude all Files
+*
 
-# Ignore generated Backups
-*.tar.gz
-
-# Ignore generated files
-timelapse.mp4
-timelapse-hd.mp4
-timelapse.gif
-
-# System files
-.DS_Store
-Icon?
+# Only Include Bash files
+!*.sh
