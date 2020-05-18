@@ -33,6 +33,68 @@ export GZIP=-9
 
 ################## FUNCTIONS ##################
 
+
+video_v3()
+{
+    # Based on article https://photo.stackexchange.com/questions/84447/how-can-i-align-hundreds-of-images
+
+    echo "Generate a pto file..."  
+    /Applications/Hugin/tools_mac/pto_gen *.jpg -o timelapse.pto
+
+    echo "Cropping to still area in Hugin Application..."  
+    echo "---------------------------------------------------------------------------"
+    echo "Open the Hugin project you generated and change the interface to advanced."
+    echo " "
+    echo "In the window that opened go to the masks tab and there chose the crop tab"
+    echo "and select your first image. Now make sure 'all images of selected lens'"
+    echo "is checked and then drag from the edges of the image and crop to the area"
+    echo "with the least or no amount of movement. This will constrict the match"
+    echo "finder to that area and reduce error in the remapping stage. Now you can"
+    echo "save and exit the program."
+    echo "---------------------------------------------------------------------------"
+    open /Applications/Hugin/Hugin.app timelapse.pto
+    read -n 1 -s -r -p "Press any key to continue"
+
+    echo "Finding control points..."  
+    /Applications/Hugin/tools_mac/cpfind --linearmatch -o timelapse.pto timelapse.pto
+
+    echo "Cleanup control points..."  
+    /Applications/Hugin/tools_mac/cpclean -o timelapse.pto timelapse.pto
+
+    echo "Reset crop in Hugin Application..."
+    echo "---------------------------------------------------------------------------"
+    echo "Now that we are done with control points open the new generated project"
+    echo "called default and head back to the masks tab like before, here select the"
+    echo "crop tab again and click the reset button, this will disable the crop from"
+    echo "all the images."
+    echo "---------------------------------------------------------------------------"
+    open /Applications/Hugin/Hugin.app timelapse.pto
+    read -n 1 -s -r -p "Press any key to continue"
+
+    echo "Optimizing position and distortion of the image set..."  
+    /Applications/Hugin/tools_mac/pto_var --opt="y, p, r, TrX, TrY, TrZ" -o timelapse.pto timelapse.pto
+    /Applications/Hugin/tools_mac/autooptimiser -n -o timelapse.pto timelapse.pto
+    
+    echo "Change project configuration..."  
+    /Applications/Hugin/tools_mac/pano_modify -o timelapse.pto --projection=0 --fov=AUTO --center --canvas=AUTO --crop=AUTOHDR --output-type=REMAPORIG timelapse.pto
+
+    echo "Remaping and output TIF images..."  
+    /Applications/Hugin/tools_mac/nona -m TIFF_m -o remapped timelapse.pto
+
+    echo "Creating timelapse video..."  
+    ffmpeg -loglevel error -r 50 -pattern_type glob -i '*.tif' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd480 -vcodec libx264 -crf 20 -y timelapse.mp4 
+    echo " - Created timelapse.mp4"
+}
+
+video_v2()
+{
+    echo "Generate aligned images..."  
+    /Applications/Hugin/tools_mac/align_image_stack -g 2 --use-given-order *.jpg -C -v -a a
+    echo "Creating video..."  
+    ffmpeg -loglevel error -r 50 -pattern_type glob -i '*.tif' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd480 -vcodec libx264 -crf 20 -y timelapse.mp4 
+    echo " - Created timelapse.mp4"
+}
+
 video()
 {
     echo "Creating video..."    
@@ -81,6 +143,16 @@ else
         # Check for --video argument
         if [ "$1" = "--video" ]; then
             video
+        fi
+
+        # Check for --v2 argument
+        if [ "$1" = "--v2" ]; then
+            video_v2
+        fi
+
+        # Check for --v3 argument
+        if [ "$1" = "--v3" ]; then
+            video_v3
         fi
 
         # move to next argument
