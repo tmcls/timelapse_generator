@@ -38,7 +38,7 @@ video_v3()
 {
     # Based on article https://photo.stackexchange.com/questions/84447/how-can-i-align-hundreds-of-images
 
-    echo "Generate a pto file..."  
+    echo "*** Generate a pto file..."  
     /Applications/Hugin/tools_mac/pto_gen *.jpg -o timelapse.pto
 
     #echo "Cropping to still area in Hugin Application..."  
@@ -55,10 +55,10 @@ video_v3()
     #open /Applications/Hugin/Hugin.app timelapse.pto
     #read -n 1 -s -r -p "Press any key to continue"
 
-    echo "Finding control points..."  
+    echo "*** Finding control points..."  
     /Applications/Hugin/tools_mac/cpfind --linearmatch -o timelapse.pto timelapse.pto
 
-    echo "Cleanup control points..."  
+    echo "*** Cleanup control points..."  
     /Applications/Hugin/tools_mac/cpclean -o timelapse.pto timelapse.pto
 
     #echo "Reset crop in Hugin Application..."
@@ -71,60 +71,55 @@ video_v3()
     #open /Applications/Hugin/Hugin.app timelapse.pto
     #read -n 1 -s -r -p "Press any key to continue"
 
-    echo "Optimizing position and distortion of the image set..."  
+    echo "*** Optimizing position and distortion of the image set..."  
     /Applications/Hugin/tools_mac/pto_var --opt="y, p, r, TrX, TrY, TrZ" -o timelapse.pto timelapse.pto
 
-    echo "The following process will take hours... and hours... and hours..." 
-    echo "Grab a coffee and some sleep. ;-)" 
+    echo "*** The following process will take hours... and hours... and hours..." 
+    echo "*** This process ends when you're control points distance is lower then 0.8" 
+    echo "*** Grab a coffee and some sleep. ;-)" 
     /Applications/Hugin/tools_mac/autooptimiser -n -o timelapse.pto timelapse.pto
     
-    echo "Changing project configuration..."  
+    echo "*** Changing project configuration..."  
     /Applications/Hugin/tools_mac/pano_modify -o timelapse.pto --projection=0 --fov=AUTO --center --canvas=AUTO --crop=AUTOHDR --output-type=REMAPORIG timelapse.pto
 
-    echo "Remaping and output TIF images..."  
+    echo "*** Remaping and output TIF images..."  
     /Applications/Hugin/tools_mac/nona -m TIFF_m -o remapped timelapse.pto
 
-    echo "Creating timelapse video..."  
-    ffmpeg -loglevel error -r 40 -pattern_type glob -i '*.tif' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd480 -vcodec libx264 -crf 20 -y timelapse.mp4 
-    echo " - Created timelapse.mp4"
-}
-
-video_v2()
-{
-    echo "Generate aligned images..."  
-    /Applications/Hugin/tools_mac/align_image_stack -g 2 --use-given-order *.jpg -C -v -a a
-    echo "Creating video..."  
-    ffmpeg -loglevel error -r 5400 -pattern_type glob -i '*.tif' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd480 -vcodec libx264 -crf 20 -y timelapse.mp4 
-    echo " - Created timelapse.mp4"
+    echo "*** Creating the timelapse video..."  
+    ffmpeg -loglevel error -r 40 -pattern_type glob -i '*.tiff' -s hd1080 -vcodec libx264 -crf 10 -preset veryslow -y timelapse-v3.mp4
+    
+    echo " - Created timelapse-v3.mp4"
 }
 
 video()
 {
-    echo "Creating video..."    
+    echo "*** Creating video..."    
     ffmpeg -loglevel error -r 40 -pattern_type glob -i '*.jpg' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd480 -vcodec libx264 -crf 20 -y timelapse.mp4
+    
     echo " - Created timelapse.mp4"
 }
 
 video_hd()
 {
-    echo "Creating HD video..."
+    echo "*** Creating HD video..."
     ffmpeg -loglevel error -r 40 -pattern_type glob -i '*.jpg' -filter:v "crop=$crop_width:$crop_height:$crop_x:$crop_y" -s hd720 -vcodec libx264 -crf 10 -preset veryslow -y timelapse-hd.mp4
+    
     echo " - Created timelapse-hd.mp4"
 }
 
 ################## RUN SCRIPT ##################
 
 # Change working directory to the correct folder
-echo "Change directory to image folder..."
+echo "*** Change directory to correct image folder..."
 cd /Users/tom/Dropbox/Apps/Werfcam/
 echo " - Current directory is: $PWD"
 
 # Create Backup of the day, if backup file not exists
 name=$(date '+%Y%m%d')
 if [[ ! -f "$name.tar.gz" ]]; then
-    echo "Creating backup ($name.tar.gz) of images..."
+    echo "*** Creating backup ($name.tar.gz)..."
     tar -cf - *.jpg | xz -9 -c - > "$name.tar.gz"
-    echo " - Backup $name.tar.gz complete."  
+    echo " - Backup $name.tar.gz created"  
 fi
 
 # Check for arguments
@@ -148,11 +143,6 @@ else
             video
         fi
 
-        # Check for --v2 argument
-        if [ "$1" = "--v2" ]; then
-            video_v2
-        fi
-
         # Check for --v3 argument
         if [ "$1" = "--v3" ]; then
             video_v3
@@ -164,11 +154,8 @@ else
 fi
 
 # Cleanup backup files - Keep only the last 5 backups.
-echo "Removing old backups..."
+echo "*** Removing old backup files..."
 ls -tp ./*.tar.gz | grep -v '/$' | tail -n +5 | xargs -I {} rm -- {}
 
 # The End
-echo "[COMPLETED]"
-
-# Open Folder
-open ./
+echo "*** COMPLETED"
