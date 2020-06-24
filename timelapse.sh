@@ -52,10 +52,11 @@ video_hd_aligned()
     /Applications/Hugin/tools_mac/pto_var --opt="y, p, r, TrX, TrY, TrZ" -o timelapse.pto timelapse.pto
 
     echo "*** [06/10] Optimising the images to find a match between them..." 
-    echo "*** The following process will take hours... and hours... and hours... Grab a coffee and some sleep. ;-)" 
+    echo "*** The following process will run for hours... and hours... and hours... Maybe days... Grab a coffee and some sleep. ;-)" 
     /Applications/Hugin/tools_mac/autooptimiser -n -o timelapse.pto timelapse.pto
     
     echo "*** [07/10] Changing project configuration..."  
+    echo "*** Again a process that will run for hours... Please be patient. Coffee is the solution." 
     /Applications/Hugin/tools_mac/pano_modify -o timelapse.pto --projection=0 --fov=AUTO --center --canvas=AUTO --crop=AUTOHDR --output-type=REMAPORIG timelapse.pto
 
     echo "*** [08/10] Remaping and output TIF images..."  
